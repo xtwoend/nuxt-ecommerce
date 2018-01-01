@@ -41,7 +41,7 @@
                 img(src="/img/google.png")
                 span Google
             li
-              a(href="#")
+              a(@click="signinViaSMS")
                 img(src="/img/sms.png")
                 span SMS
 
@@ -55,6 +55,8 @@ export default {
       username: '',
       password: '',
       error: false,
+      country_code: '+62',
+      phone_number: '',
       fbParams: {
         scope: 'email',
         return_scopes: true
@@ -72,7 +74,11 @@ export default {
       if (data['token'] !== undefined) {
         this.$store.dispatch('auth/updateToken', data.token)
         await this.$store.dispatch('auth/fetch')
-        this.$modal.hide('login')
+        // this.$modal.hide('login')
+        this.$router.go({
+          path: '/',
+          force: true
+        })
       }
       this.error = true
       this.$store.commit('SHOW_LOADING', false)
@@ -84,14 +90,6 @@ export default {
     forgotPassword () {
       this.$modal.hide('login')
       this.$modal.show('forgotPassword')
-    },
-    onSignInSuccess (response) {
-      this.$FB.api('/me', (dude) => {
-        console.log(`Good to see you, ${dude.name}.`)
-      })
-    },
-    onSignInError (error) {
-      console.log('OH NOES', error)
     },
     signinFacebook () {
       this.$FB.login((res) => {
@@ -116,6 +114,29 @@ export default {
           })
         })
       })
+    },
+    signinViaSMS () {
+      this.$modal.hide('login')
+      window.AccountKit.login(
+        'PHONE',
+        {countryCode: this.country_code, phoneNumber: this.phone_number}, (res) => {
+          console.log(res)
+          if (res.status === 'PARTIALLY_AUTHENTICATED') {
+            this.$axios.$post('auth/otp', { code: res.code }).then((data) => {
+              // console.log(data)
+              if (data['token'] !== undefined) {
+                this.$store.dispatch('auth/updateToken', data.token)
+                this.$store.dispatch('auth/fetch')
+                this.$router.go({
+                  path: '/',
+                  force: true
+                })
+                // this.$store.commit('SHOW_LOADING', false)
+              }
+            })
+          }
+        }
+      )
     }
   }
 }
@@ -139,7 +160,7 @@ export default {
     }
   }
   .form__login {
-    padding: 2rem;
+    padding: 1rem 2rem;
     .input {
       padding: 1.3rem 1rem;
       margin-bottom: 1rem;

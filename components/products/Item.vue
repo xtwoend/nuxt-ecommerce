@@ -1,12 +1,24 @@
 <template lang="pug">
   .list-products.item__card
-    nuxt-link.product__link.muted(to="#")
+    a.product__link.muted(@click.prevent="detail")
       .product__card
-        .product__img
-          lazy-image(
-            :src="'https://cf.shopee.co.id/file/'+item.image"
-            placeholder="/img/no_image.jpg"
-          )
+        .product__img.lazyimg__container
+          .lazyimg__placeholder
+            <svg viewBox="355 217 250 250" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g id="Group" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" transform="translate(355.000000, 217.000000)">
+                    <rect id="Rectangle" fill="#E8E8E8" x="0" y="0" width="250" height="250"></rect>
+                    <g id="Group-3" transform="translate(84.000000, 93.612335)" fill="#FFFFFF">
+                        <polygon id="Shape" points="0 0 0 53.2305433 10.25 53.2305433 10.25 47.907489 5.125 47.907489 5.125 5.32305433 66.625 5.32305433 66.625 10.6461087 71.75 10.6461087 71.75 0"></polygon>
+                        <path d="M20.5,47.2643214 C20.5,49.6950044 21.525,51.8494734 23.11375,53.2305433 L71.75,53.2305433 L71.75,21.3554505 C70.46875,21.0792365 70.725,21.7973929 69.3925,21.7973929 C63.29375,21.7973929 58.57875,24.7805038 54.99125,29.4761414 C54.325,26.9902156 52.1725,25.1672034 49.66125,25.1672034 C46.6375,25.1672034 44.1775,27.8741003 44.1775,31.1334252 L44.22875,31.9620672 L44.1775,31.9620672 C38.28375,31.9620672 33.36375,36.2710052 31.98,42.0714987 C30.75,41.0771284 29.26375,40.4694576 27.5725,40.4694576 C23.6775,40.4694576 20.5,43.065869 20.5,47.2643214 L20.5,47.2643214 Z M25.83,28.4265283 C25.83,29.8075982 26.90625,30.9676969 28.1875,30.9676969 C29.46875,30.9676969 30.545,29.8075982 30.545,28.4265283 C30.545,26.9902156 29.46875,25.8853597 28.1875,25.8853597 C26.90625,25.8853597 25.83,26.9902156 25.83,28.4265283 L25.83,28.4265283 Z" id="Shape"></path>
+                        <path d="M10.25,10.6461087 L10.25,63.876652 L82,63.876652 L82,10.6461087 L10.25,10.6461087 L10.25,10.6461087 Z M15.375,15.969163 L76.875,15.969163 L76.875,58.5535977 L15.375,58.5535977 L15.375,15.969163 L15.375,15.969163 Z" id="Shape"></path>
+                    </g>
+                </g>
+            </svg>
+          no-ssr
+            lazy-image(
+              class="lazyimg__img",
+              :src="'https://cf.shopee.co.id/file/'+item.image"
+            )
         .product__attribute
           .item__name {{ item.name }}
           .item__price
@@ -32,28 +44,50 @@
 
 <script>
 import StarRating from '~/components/common/rating'
+import NoSSR from 'vue-no-ssr'
+
 export default {
-  name: 'ListItem',
+  name: 'Item',
   props: [ 'item' ],
   components: {
-    StarRating
+    StarRating,
+    NoSSR
   },
   data () {
     return {
-      //
+    }
+  },
+  methods: {
+    detail () {
+      let item = this.item
+      let url = this.strToSlug(item.name) + '.' + item.shopid + '.' + item.itemid
+      this.$store.commit('SET_PRODUCT_DETAIL', item)
+      this.$router.push(url)
+    },
+    strToSlug (str) {
+      /* eslint-disable */
+      return str.toString()
+        .replace(/\s+/g, '-')
+        .replace(/[^\w\-]+/g, '')
+        .replace(/\-\-+/g, '-')
+        .replace(/^-+/, '')
+        .replace(/-+$/, '')
+      /* eslint-enable */
     }
   }
 }
 </script>
 
 <style lang="scss" scoped>
+@import "~assets/scss/variables";
+
 .product__link {
   text-decoration: none;
   color: #333;
 }
 
 .product__card {
-  box-shadow: 0 0.1rem 0.2rem 0 rgba(0,0,0,.1);
+  // box-shadow: 0 0.1rem 0.2rem 0 rgba(0,0,0,.1);
   border-radius: 2px;
   overflow: hidden;
   overflow: visible;
@@ -61,13 +95,15 @@ export default {
   cursor: pointer;
   position: relative;
   &:hover {
-    -webkit-transition: all 0.1s ease-in-out;
-    -moz-transition: all 0.1s ease-in-out;
-    -o-transition: all 0.1s ease-in-out;
-    transform: translate(0,-5px);
-    -webkit-transform: translate(0,-5px);
-    -o-transform: translate(0,-5px); 
-    -moz-transform: translate(0,-5px);
+    // -webkit-transition: all 0.1s ease-in-out;
+    // -moz-transition: all 0.1s ease-in-out;
+    // -o-transition: all 0.1s ease-in-out;
+    // transform: translate(0,-5px);
+    // -webkit-transform: translate(0,-5px);
+    // -o-transform: translate(0,-5px); 
+    // -moz-transform: translate(0,-5px);
+    // box-shadow: 0.1rem 0.2rem 0.2rem 0 rgba(0,0,0,.1);
+    box-shadow: 0 2px 10px rgba(0,0,0,.3);
   }
   > .product__attribute {
     padding: 0 10px 10px;

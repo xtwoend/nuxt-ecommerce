@@ -10,5 +10,8 @@ npm-debug.log
 # Nuxt generate
 dist
 
+# Workbox generate file
 sw.*
+
+# Webpackmonitor
 .monitor
